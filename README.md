@@ -14,7 +14,9 @@ Follow these steps to get the project running in your development environment.1.
     
 **3. Environment Setup**
 Create a .env file inside the /backend folder and add your Azure credentials. Do not commit this file to GitHub.
+
       AZURE_OPENAI_KEY=your_actual_api_key_here
+      
       AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com/
       
       AZURE_OPENAI_DEPLOYMENT=""
