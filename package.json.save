@@ -1,0 +1,58 @@
+{
+  "name": "tryagain-jan10",
+{
+  "name": "tryagain-jan10",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "express": "^4.19.0",
+    "node-fetch": "^3.3.2"
+  }
+}
+{
+  "name": "tryagain-jan10",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "express": "^4.19.0",
+    "node-fetch": "^3.3.2"
+  }
+}
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rcmarcel0/tryagain-jan10.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rcmarcel0/tryagain-jan10/issues"
+  },
+  "homepage": "https://github.com/rcmarcel0/tryagain-jan10#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+
+^x
+^X
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2"
+  }
+}
