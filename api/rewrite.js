@@ -1,3 +1,4 @@
+import { app } from "@azure/functions";
 import fetch from "node-fetch";
 
 let conversationHistory = [
@@ -19,55 +20,58 @@ let conversationHistory = [
   }
 ];
 
-export async function handler(request) {
-  try {
-    const { text } = await request.json();
+app.http('rewrite', {
+    methods: ['POST'],
+    authLevel: 'anonymous',
+    handler: async (request, context) => {
+        try {
+            const { text } = await request.json();
 
-    if (!text) {
-      return new Response(
-        JSON.stringify({ error: "Text is required" }),
-        { status: 400 }
-      );
+            if (!text) {
+                return { status: 400, jsonBody: { error: "Text is required" } };
+            }
+
+            conversationHistory.push({ role: "user", content: text });
+
+            // Ensure endpoint format is correct for the request
+            const baseEndpoint = process.env.AZURE_OPENAI_ENDPOINT
+                .replace(/\/+$/, "")
+                .replace(/\/openai$/, "");
+
+            const url = `${baseEndpoint}/openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=2024-02-15-preview`;
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "api-key": process.env.AZURE_OPENAI_API_KEY
+                },
+                body: JSON.stringify({
+                    messages: conversationHistory,
+                    temperature: 0.7
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return { status: response.status, jsonBody: data };
+            }
+
+            const aiResponse = data.choices[0].message.content.trim();
+            conversationHistory.push({ role: "assistant", content: aiResponse });
+
+            return { 
+                status: 200, 
+                jsonBody: { rewrittenText: aiResponse } 
+            };
+
+        } catch (err) {
+            context.error(`Server Error: ${err.message}`);
+            return { 
+                status: 500, 
+                jsonBody: { error: "Could not connect to the rephrasing service." } 
+            };
+        }
     }
-
-    conversationHistory.push({ role: "user", content: text });
-
-    const baseEndpoint = process.env.AZURE_OPENAI_ENDPOINT
-      .replace(/\/+$/, "")
-      .replace(/\/openai$/, "");
-
-    const url = `${baseEndpoint}/openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=2024-02-15-preview`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": process.env.AZURE_OPENAI_API_KEY
-      },
-      body: JSON.stringify({
-        messages: conversationHistory,
-        temperature: 0.7
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return new Response(JSON.stringify(data), { status: response.status });
-    }
-
-    const aiResponse = data.choices[0].message.content.trim();
-    conversationHistory.push({ role: "assistant", content: aiResponse });
-
-    return new Response(
-      JSON.stringify({ rewrittenText: aiResponse }),
-      { status: 200 }
-    );
-
-  } catch (err) {
-    return new Response(
-      JSON.stringify({ error: "Could not connect to the rephrasing service." }),
-      { status: 500 }
-    );
-  }
-}
+});
